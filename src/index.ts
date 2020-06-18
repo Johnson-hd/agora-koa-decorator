@@ -62,62 +62,78 @@ async function formatResponse(descriptor: any, ctx: Context) {
   }
 }
 
-const router = new Router()
+export const router = new Router()
+
+// export const userRouter = new Router()
+const childRouter = new Router()
+
+childRouter.get(
+  '/',
+  ...[
+    () => {
+      console.log(1)
+    },
+  ],
+  (ctx, next) => {
+    ctx.body = '1'
+  },
+)
+// childRouter.get('/:pid', (ctx, next) => {
+//   ctx.body = '2'
+// })
+// userRouter.use('/user', childRouter.routes(), childRouter.allowedMethods())
 
 // @router 装饰器
 export function route(path: string, method?: HttpMethod, ...middleware: Array<Middleware>) {
   return (target: any, key?: string | symbol, descriptor?: any): void => {
-    console.log('path', path)
-    console.log('method', method)
-    console.log('middleware', middleware)
-    console.log('target', target)
-    console.log('key', key)
-    console.log('descriptor', descriptor)
-    // Decorator applied to Class (for Constructor injection).
-    if (typeof target === 'function' && key === undefined && descriptor === undefined) {
-      if (!target.prototype.router) {
-        target.prototype.router = new Router()
-      }
-      if (middleware.length > 0) {
-        target.prototype.router.use(...middleware)
-      }
-      router.use(path, target.prototype.router.routes(), target.prototype.router.allowedMethods())
-      return
-    } else if (typeof target === 'object') {
-      if (!target.router) {
-        target.router = new Router()
-      }
-      const handleReturnMiddleware = async function (ctx: Context) {
-        await formatResponse(descriptor, ctx)
-      }
-      // Decorator applied to member (method or property).
-      switch (method) {
-        case HttpMethod.HEAD:
-          target.router.head(path, ...middleware, handleReturnMiddleware)
-          break
-        case HttpMethod.OPTIONS:
-          target.router.options(path, ...middleware, handleReturnMiddleware)
-          break
-        case HttpMethod.GET:
-          target.router.get(path, ...middleware, handleReturnMiddleware)
-          break
-        case HttpMethod.PUT:
-          target.router.put(path, ...middleware, handleReturnMiddleware)
-          break
-        case HttpMethod.PATCH:
-          target.router.patch(path, ...middleware, handleReturnMiddleware)
-          break
-        case HttpMethod.POST:
-          target.router.post(path, ...middleware, handleReturnMiddleware)
-          break
-        case HttpMethod.DELETE:
-          target.router.del(path, ...middleware, handleReturnMiddleware)
-          break
-        default:
-          target.router.all(path, ...middleware, handleReturnMiddleware)
-          break
-      }
+    if (!target.router) {
+      target.router = new Router()
     }
+    const handleReturnMiddleware = async function (ctx: Context) {
+      await formatResponse(descriptor, ctx)
+    }
+    // Decorator applied to member (method or property).
+    switch (method) {
+      case HttpMethod.HEAD:
+        target.router.head(path, ...middleware, handleReturnMiddleware)
+        break
+      case HttpMethod.OPTIONS:
+        target.router.options(path, ...middleware, handleReturnMiddleware)
+        break
+      case HttpMethod.GET:
+        // target.router.use(...middleware)
+        target.router.get(path, ...middleware, handleReturnMiddleware)
+        break
+      case HttpMethod.PUT:
+        target.router.put(path, ...middleware, handleReturnMiddleware)
+        break
+      case HttpMethod.PATCH:
+        target.router.patch(path, ...middleware, handleReturnMiddleware)
+        break
+      case HttpMethod.POST:
+        target.router.post(path, ...middleware, handleReturnMiddleware)
+        break
+      case HttpMethod.DELETE:
+        target.router.del(path, ...middleware, handleReturnMiddleware)
+        break
+      default:
+        target.router.all(path, ...middleware, handleReturnMiddleware)
+        break
+    }
+  }
+}
+
+export function controller(path: string, method?: HttpMethod, ...middleware: Array<Middleware>) {
+  return (target: any, key?: string | symbol, descriptor?: any): void => {
+    if (!target.prototype.router) {
+      target.prototype.router = new Router()
+    }
+    if (middleware.length > 0) {
+      target.prototype.router.use(...middleware)
+    }
+    // 注册
+    // console.log("controller created : ", path); // , target.prototype.router);
+    router.use(path, target.prototype.router.routes(), target.prototype.router.allowedMethods())
   }
 }
 
@@ -126,11 +142,10 @@ export function route(path: string, method?: HttpMethod, ...middleware: Array<Mi
  * @param controllersDir 陈放所有route的文件夹路径
  * @param extension 只导入对应后缀的文件作为route，默认导入所有的.js文件
  */
-export function load(controllersDir: string, extension = '.ts'): Router {
+export function bootstrap(controllersDir: string, extension = '.ts') {
   getFiles(controllersDir).forEach(file => {
     if (file.endsWith(extension)) {
       require(file)
     }
   })
-  return router
 }

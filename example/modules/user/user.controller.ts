@@ -1,9 +1,9 @@
 import { Context } from 'koa'
 
-import { HttpMethod, route } from '../../src'
-import authMiddleware from '../middlewares/auth'
+import { HttpMethod, route, controller } from '../../../src'
+import authMiddleware from '../../middlewares/auth'
 
-@route('/user')
+@controller('/user')
 export default class User {
   @route('/info', HttpMethod.GET, authMiddleware)
   async getUserInfo(ctx: Context) {

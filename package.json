@@ -8,7 +8,7 @@
     "lib"
   ],
   "scripts": {
-    "dev": "ts-node-dev example/index.ts",
+    "dev": "ts-node-dev --transpileOnly --no-notify --ignore-watch node_modules example/index.ts",
     "build": "tsc"
   },
   "repository": {
