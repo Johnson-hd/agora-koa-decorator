@@ -52,6 +52,7 @@
   },
   "dependencies": {
     "koa": "^2.12.1",
+    "koa-bodyparser": "^4.3.0",
     "koa-router": "^9.0.1",
     "typescript": "^3.9.5"
   }

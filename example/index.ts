@@ -1,17 +1,15 @@
 import Koa from 'koa'
+import KoaBodyParser from 'koa-bodyparser'
 import path from 'path'
-// import Router from 'koa-router'
-// const router = new Router()
 
 import { bootstrap, router } from '../src'
-const app = new Koa()
 
+const app = new Koa()
 const port = 8083 || process.env.PORT
 
-// router.prefix('/api')
 bootstrap(path.resolve(__dirname, 'modules'))
-// app.use(userRouter.routes())
-app.use(router.routes())
+
+app.use(KoaBodyParser()).use(router.routes())
 
 app.on('error', (err, ctx) => {
   console.error(
@@ -20,5 +18,5 @@ app.on('error', (err, ctx) => {
 })
 
 app.listen(port, () => {
-  console.info(`Service is listening on ort ${port}!`)
+  console.info(`Service is listening on port ${port}`)
 })
