@@ -10,6 +10,7 @@ const port = 8083 || process.env.PORT
 
 bootstrap(path.resolve(__dirname, 'modules'))
 
+router.prefix('/api')
 app.use(KoaBodyParser()).use(router.routes())
 
 app.on('error', (err, ctx) => {
