@@ -1,6 +1,6 @@
 const log = async (ctx, next) => {
   console.log('==== pass log middleware ===')
-  next()
+  await next()
 }
 
 export default log

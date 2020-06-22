@@ -1,6 +1,6 @@
 {
   "name": "agora-koa-decorator",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "agora-koa-decorator",
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",

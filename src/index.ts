@@ -1,7 +1,7 @@
-import { Context, Middleware } from 'koa'
+import { Context, Next, Middleware } from 'koa'
 import Router from 'koa-router'
 
-import { parseDir, formatResponse } from './utils'
+import { parseDir } from './utils'
 import { HttpMethod } from './model'
 
 export const router = new Router()
@@ -20,8 +20,8 @@ export const Route = (path: string, method?: HttpMethod, ...middleware: Array<Mi
     if (!target.router) {
       target.router = new Router()
     }
-    const callback = async (ctx: Context) => {
-      await formatResponse(descriptor, ctx)
+    const callback = async (ctx: Context, next: Next) => {
+      await descriptor.value(ctx, next)
     }
     target.router[(method || 'GET').toLowerCase()](path || '/', ...middleware, callback)
   }
